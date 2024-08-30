@@ -13,6 +13,7 @@ namespace DotnetWebApiWithEFCodeFirst.Models
         }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Products> Products { get; set; }
+        public virtual DbSet<Coupons> Coupons { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Users>(entity =>
@@ -21,6 +22,11 @@ namespace DotnetWebApiWithEFCodeFirst.Models
             });
 
             modelBuilder.Entity<Products>(entity =>
+            {
+                entity.HasKey(k => k.id);
+            });
+
+            modelBuilder.Entity<Coupons>(entity =>
             {
                 entity.HasKey(k => k.id);
             });
