@@ -12,12 +12,19 @@ namespace DotnetWebApiWithEFCodeFirst.Models
         {
         }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<Products> Products { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasKey(k => k.id);
             });
+
+            modelBuilder.Entity<Products>(entity =>
+            {
+                entity.HasKey(k => k.id);
+            });
+
             OnModelCreatingPartial(modelBuilder);
         }
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
