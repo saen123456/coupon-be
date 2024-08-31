@@ -30,12 +30,14 @@ public class UserController : ControllerBase
         return Ok(_context.Users.ToList());
     }
 
+    [Authorize]
     [HttpGet("{id}")] //receive parameter id
     public ActionResult GetUserById(long id)
     {
         return Ok(_context.Users.Find(id));
     }
 
+    [Authorize]
     [HttpPost("register")]
     public ActionResult CreateUser(Users users)
     {
@@ -48,6 +50,7 @@ public class UserController : ControllerBase
         return CreatedAtAction(nameof(GetUsers), users);
     }
 
+    [Authorize]
     [HttpPut("{id}/update")]
     public IActionResult UpdateUser(long? id, [FromBody] Users users)
     {

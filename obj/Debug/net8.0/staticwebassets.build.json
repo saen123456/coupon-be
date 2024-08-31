@@ -1,11 +1,39 @@
 {
   "Version": 1,
-  "Hash": "hrTggWyyeiBK9ii5tSCCKF94YPvGwEaXdQh9wPp/l1w=",
+  "Hash": "AW547Hgb9Nnkb5MLL3oJDoIZkPDNy9tAdPjcf6uVLpQ=",
   "Source": "coupon-be",
   "BasePath": "_content/coupon-be",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "coupon-be/wwwroot",
+      "Source": "coupon-be",
+      "ContentRoot": "/Users/pipatangkaew/Desktop/dotnet/coupon-be/wwwroot/",
+      "BasePath": "_content/coupon-be",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/Users/pipatangkaew/Desktop/dotnet/coupon-be/wwwroot/images/Screenshot 2567-05-10 at 10.07.37.png",
+      "SourceId": "coupon-be",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/pipatangkaew/Desktop/dotnet/coupon-be/wwwroot/",
+      "BasePath": "_content/coupon-be",
+      "RelativePath": "images/Screenshot 2567-05-10 at 10.07.37.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/images/Screenshot 2567-05-10 at 10.07.37.png"
+    }
+  ]
 }

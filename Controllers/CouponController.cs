@@ -1,4 +1,5 @@
 using DotnetWebApiWithEFCodeFirst.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -47,6 +48,7 @@ public class CouponController : ControllerBase
         return CreatedAtAction(nameof(GetCoupons), new { id = coupon.id }, coupon);
     }
 
+    [Authorize]
     [HttpPut("update/usage")]
     public async Task<IActionResult> UpdateUser([FromBody] Coupons coupon)
     {

@@ -137,3 +137,4 @@
 /Users/pipatangkaew/Desktop/dotnet/coupon-be/obj/Debug/net8.0/coupon-be.sourcelink.json
 /Users/pipatangkaew/Desktop/dotnet/coupon-be/bin/Debug/net8.0/AuthenticationPlugin.dll
 /Users/pipatangkaew/Desktop/dotnet/coupon-be/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/pipatangkaew/Desktop/dotnet/coupon-be/bin/Debug/net8.0/coupon-be.staticwebassets.runtime.json

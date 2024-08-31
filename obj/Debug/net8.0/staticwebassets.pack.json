@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/pipatangkaew/Desktop/dotnet/coupon-be/wwwroot/images/Screenshot 2567-05-10 at 10.07.37.png",
+      "PackagePath": "staticwebassets/images/Screenshot 2567-05-10 at 10.07.37.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.coupon-be.props",
+      "PackagePath": "build\\coupon-be.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.coupon-be.props",
+      "PackagePath": "buildMultiTargeting\\coupon-be.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.coupon-be.props",
+      "PackagePath": "buildTransitive\\coupon-be.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.coupon-be.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

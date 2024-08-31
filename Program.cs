@@ -51,6 +51,8 @@ app.UseHttpsRedirection();
 
 app.UsePathBase("/api");
 
+app.UseStaticFiles(); // ใช้สำหรับเสิร์ฟไฟล์สาธารณะ
+
 app.UseRouting();
 
 app.UseAuthentication();  // เรียกใช้ก่อน Authorization

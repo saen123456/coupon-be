@@ -11,17 +11,18 @@ namespace DotnetWebApiWithEFCodeFirst.Models
 
         [Required]
         [MaxLength(255)]
-        public string username { get; set; }
+        public string name { get; set; }
 
         [Required]
         [MaxLength(255)]
-        public string email { get; set; }
+        public string description { get; set; }
 
         [Required]
-        [MaxLength(255)]
-        public string password { get; set; }
+        public long price { get; set; }
 
         [Required]
-        public bool is_admin { get; set; }
+        public int stock { get; set; }
+
+        public string image { get; set; }
     }
 }
