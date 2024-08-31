@@ -18,7 +18,7 @@ namespace DotnetWebApiWithEFCodeFirst.Models
         public string description { get; set; }
 
         [Required]
-        public long price { get; set; }
+        public decimal price { get; set; }
 
         [Required]
         public int stock { get; set; }
