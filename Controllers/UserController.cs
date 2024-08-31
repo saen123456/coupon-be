@@ -1,6 +1,11 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using DotnetWebApiWithEFCodeFirst.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Validations.Rules;
 
 namespace coupon_be.Controllers;
@@ -10,11 +15,15 @@ namespace coupon_be.Controllers;
 public class UserController : ControllerBase
 {
     private readonly SampleDBContext _context;
-    public UserController(SampleDBContext context)
+    private readonly string _jwtKey;
+
+    public UserController(SampleDBContext context, IConfiguration configuration)
     {
         _context = context;
+        _jwtKey = configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT_SECRET_KEY is not set");
     }
 
+    [Authorize]
     [HttpGet("lists")]
     public ActionResult<List<string>> GetUsers()
     {
@@ -96,4 +105,40 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPost("login")]
+    public IActionResult Login([FromBody] LoginRequest request)
+    {
+        var user = _context.Users.SingleOrDefault(u => u.username == request.username && u.password == request.password);
+        if (user == null)
+        {
+            return Unauthorized("Invalid username or password.");
+        }
+
+        // Generate JWT token
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_jwtKey);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                 new Claim(ClaimTypes.Name, user.username),
+                 new Claim(ClaimTypes.Email, user.email),
+                 new Claim("UserId", user.id.ToString()),
+                 new Claim("IsAdmin", user.is_admin.ToString())
+             }),
+            Expires = DateTime.UtcNow.AddHours(1),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
+
+        return Ok(new { Token = tokenString });
+    }
+
+    // Define the LoginRequest model
+    public class LoginRequest
+    {
+        public string username { get; set; }
+        public string password { get; set; }
+    }
 }

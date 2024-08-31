@@ -1,5 +1,8 @@
 using DotnetWebApiWithEFCodeFirst.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +20,24 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "SSS .NET 8 Demo", Version = "v1" })
 );
 
+// Add Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("146d7a0344376048a7440ea3381d3680753f923e4a33f49334b093985d4cc33d")) // ควรใช้ key เดียวกับที่ใช้สร้าง token
+    };
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,6 +52,8 @@ app.UseHttpsRedirection();
 app.UsePathBase("/api");
 
 app.UseRouting();
+
+app.UseAuthentication();  // เรียกใช้ก่อน Authorization
 
 app.UseAuthorization();
 
