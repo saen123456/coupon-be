@@ -45,10 +45,11 @@ public class CouponController : ControllerBase
         _context.Coupons.Add(coupon);
         await _context.SaveChangesAsync(); // Await the asynchronous SaveChanges method
 
-        return CreatedAtAction(nameof(GetCoupons), new { id = coupon.id }, coupon);
+        // return CreatedAtAction(nameof(GetCoupons), new { id = coupon.id }, coupon);
+        return Ok(_context.Coupons.ToList());
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpPut("update/usage")]
     public async Task<IActionResult> UpdateUser([FromBody] Coupons coupon)
     {
@@ -65,7 +66,7 @@ public class CouponController : ControllerBase
 
         try
         {
-            var cp = await _context.Coupons.Where(x => x.code.Contains(coupon.code)).FirstOrDefaultAsync();
+            var cp = await _context.Coupons.Where(x => x.code == coupon.code).FirstOrDefaultAsync();
             if (cp == null)
             {
                 return NotFound($"Coupon with {coupon.code} not found.");
