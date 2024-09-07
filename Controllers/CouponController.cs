@@ -1,7 +1,5 @@
 using DotnetWebApiWithEFCodeFirst.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,85 +9,64 @@ namespace coupon_be.Controllers;
 [Route("[controller]")]
 public class CouponController : ControllerBase
 {
-    private readonly SampleDBContext _context;
     private readonly ICouponService _couponService;
+    private readonly ICouponRepository _couponRepository;
+    private readonly SampleDBContext _context;
 
-    public CouponController(ICouponService couponService, SampleDBContext context)
+    public CouponController(ICouponService couponService, ICouponRepository couponRepository, SampleDBContext context)
     {
-        _context = context;
         _couponService = couponService;
+        _couponRepository = couponRepository;
+        _context = context;
     }
 
     [HttpGet("lists")]
-    public ActionResult<List<string>> GetCoupons()
+    public async Task<ActionResult<List<Coupons>>> GetCoupons()
     {
-        return Ok(_context.Coupons.ToList());
+        var coupons = await _couponService.GetCouponsAsync();
+        return Ok(coupons);
     }
 
-    [HttpGet("{id}")] //receive parameter id
-    public ActionResult GetUserById(long id)
+    [HttpGet("{id}")]
+    public async Task<ActionResult> GetCouponById(long id)
     {
-        return Ok(_context.Users.Find(id));
+        var coupon = await _couponService.GetCouponByIdAsync(id);
+        if (coupon == null)
+        {
+            return NotFound($"Coupon with ID {id} not found.");
+        }
+        return Ok(coupon);
     }
 
     [HttpGet("generate")]
     public async Task<IActionResult> GenerateCoupon()
     {
-        var coupon = new Coupons
+        try
         {
-            code = await _couponService.GenerateUniqueCouponCode(), // Await the asynchronous method
-            expires_at = DateTimeOffset.UtcNow.AddDays(30), // Set an expiry date (example)
-            usage_count = 0
-        };
-
-        _context.Coupons.Add(coupon);
-        await _context.SaveChangesAsync(); // Await the asynchronous SaveChanges method
-
-        // return CreatedAtAction(nameof(GetCoupons), new { id = coupon.id }, coupon);
-        return Ok(_context.Coupons.ToList());
+            var coupon = await _couponService.GenerateCouponAsync();
+            return Ok(coupon);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception
+            return StatusCode(500, "An error occurred while generating the coupon." + ex.ToString());
+        }
     }
 
-    // [Authorize]
     [HttpPut("update/usage")]
-    public async Task<IActionResult> UpdateUser([FromBody] Coupons coupon)
+    public async Task<IActionResult> UpdateUsage([FromBody] Coupons coupon)
     {
-        if (coupon.code == null)
-        {
-            return BadRequest("Coupon Code is required.");
-        }
-
-        // Validate the model
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        try
+        var updatedCoupon = await _couponService.UpdateCouponUsageAsync(coupon);
+        if (updatedCoupon == null)
         {
-            var cp = await _context.Coupons.Where(x => x.code == coupon.code).FirstOrDefaultAsync();
-            if (cp == null)
-            {
-                return NotFound($"Coupon with {coupon.code} not found.");
-            }
+            return NotFound($"Coupon with code {coupon.code} not found.");
+        }
 
-            cp.usage_count++;
-            _context.Coupons.Update(cp);
-            _context.SaveChanges();
-
-            return CreatedAtAction(nameof(GetCoupons), new { id = cp.id }, cp);
-        }
-        catch (DbUpdateException ex)
-        {
-            // Handle specific database update exceptions if needed
-            // Log the exception or handle accordingly
-            return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the user in the database.");
-        }
-        catch (Exception ex)
-        {
-            // Handle any other exceptions
-            // Log the exception or handle accordingly
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-        }
+        return Ok(updatedCoupon);
     }
-
 }
