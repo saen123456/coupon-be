@@ -17,24 +17,31 @@ public class UserController : ControllerBase
     private readonly SampleDBContext _context;
     private readonly string _jwtKey;
 
-    public UserController(SampleDBContext context, IConfiguration configuration)
+    private readonly IUserService _userService;
+    private readonly IUserRepository _userRepository;
+
+    public UserController(SampleDBContext context, IConfiguration configuration, IUserService userService)
     {
         _context = context;
+        _userService = userService; // Initialize the service
         _jwtKey = configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT_SECRET_KEY is not set");
     }
 
+
     [Authorize]
     [HttpGet("lists")]
-    public ActionResult<List<string>> GetUsers()
+    public async Task<ActionResult<List<string>>> GetUsersAsync()
     {
-        return Ok(_context.Users.ToList());
+        var users = await _userService.GetUsersAsync();
+        return Ok(users);
     }
 
     [Authorize]
     [HttpGet("{id}")] //receive parameter id
-    public ActionResult GetUserById(long id)
+    public async Task<ActionResult> GetUserByIdAsync(long id)
     {
-        return Ok(_context.Users.Find(id));
+        var user = await _userService.GetUserByIdAsync(id);
+        return Ok(user);
     }
 
     [Authorize]
@@ -47,7 +54,7 @@ public class UserController : ControllerBase
         }
         _context.Users.Add(users);
         _context.SaveChanges();
-        return CreatedAtAction(nameof(GetUsers), users);
+        return CreatedAtAction(nameof(GetUsersAsync), users);
     }
 
     [Authorize]
@@ -109,39 +116,30 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request)
     {
-        var user = _context.Users.SingleOrDefault(u => u.username == request.username && u.password == request.password);
-        if (user == null)
+        try
         {
-            return Unauthorized("Invalid username or password.");
-        }
-
-        // Generate JWT token
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtKey);
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
+            var userLogin = await _userService.LoginAsync(request);
+            if (userLogin == null)
             {
-                 new Claim(ClaimTypes.Name, user.username),
-                 new Claim(ClaimTypes.Email, user.email),
-                 new Claim("UserId", user.id.ToString()),
-                 new Claim("IsAdmin", user.is_admin.ToString())
-             }),
-            Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
+                return Unauthorized("Invalid username or password.");
+            }
 
-        return Ok(new { Token = tokenString });
+            var userToken = await _userService.GenerateTokenUserLoginAsync(userLogin);
+            return Ok(new { Token = userToken });
+        }
+        catch (Exception ex)
+        {
+            // Log the exception
+            return StatusCode(500, "An error occurred while login." + ex.ToString());
+        }
     }
 
     // Define the LoginRequest model
     public class LoginRequest
     {
-        public string username { get; set; }
-        public string password { get; set; }
+        public required string username { get; set; }
+        public required string password { get; set; }
     }
 }
